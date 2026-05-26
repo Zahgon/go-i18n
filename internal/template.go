@@ -18,19 +18,6 @@ type Template struct {
 }
 
 func (t *Template) Execute(parser template.Parser, data interface{}) (string, error) {
-	var pt template.ParsedTemplate
-	var err error
-	if parser.Cacheable() {
-		t.parseOnce.Do(func() {
-			t.parsedTemplate, t.parseError = parser.Parse(t.Src, t.LeftDelim, t.RightDelim)
-		})
-		pt, err = t.parsedTemplate, t.parseError
-	} else {
-		pt, err = parser.Parse(t.Src, t.LeftDelim, t.RightDelim)
-	}
-
-	if err != nil {
-		return "", err
-	}
-	return pt.Execute(data)
+	_ = "STUB: not implemented"
+	return "", nil
 }

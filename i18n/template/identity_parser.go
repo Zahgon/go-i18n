@@ -4,12 +4,14 @@ package template
 type IdentityParser struct{}
 
 func (IdentityParser) Cacheable() bool {
+	_ = "STUB: not implemented"
 	// Caching is not necessary because Parse is cheap.
 	return false
 }
 
 func (IdentityParser) Parse(src, leftDelim, rightDelim string) (ParsedTemplate, error) {
-	return &identityParsedTemplate{src: src}, nil
+	_ = "STUB: not implemented"
+	return *new(ParsedTemplate), nil
 }
 
 type identityParsedTemplate struct {
@@ -17,5 +19,6 @@ type identityParsedTemplate struct {
 }
 
 func (t *identityParsedTemplate) Execute(data any) (string, error) {
-	return t.src, nil
+	_ = "STUB: not implemented"
+	return "", nil
 }

@@ -1,7 +1,6 @@
 package i18n
 
 import (
-	"fmt"
 	texttemplate "text/template"
 
 	"github.com/nicksnyder/go-i18n/v2/i18n/template"
@@ -16,31 +15,11 @@ type MessageTemplate struct {
 }
 
 // NewMessageTemplate returns a new message template.
-func NewMessageTemplate(m *Message) *MessageTemplate {
-	pluralTemplates := map[plural.Form]*internal.Template{}
-	setPluralTemplate(pluralTemplates, plural.Zero, m.Zero, m.LeftDelim, m.RightDelim)
-	setPluralTemplate(pluralTemplates, plural.One, m.One, m.LeftDelim, m.RightDelim)
-	setPluralTemplate(pluralTemplates, plural.Two, m.Two, m.LeftDelim, m.RightDelim)
-	setPluralTemplate(pluralTemplates, plural.Few, m.Few, m.LeftDelim, m.RightDelim)
-	setPluralTemplate(pluralTemplates, plural.Many, m.Many, m.LeftDelim, m.RightDelim)
-	setPluralTemplate(pluralTemplates, plural.Other, m.Other, m.LeftDelim, m.RightDelim)
-	if len(pluralTemplates) == 0 {
-		return nil
-	}
-	return &MessageTemplate{
-		Message:         m,
-		PluralTemplates: pluralTemplates,
-	}
-}
+func NewMessageTemplate(m *Message) *MessageTemplate { _ = "STUB: not implemented"; return nil }
 
 func setPluralTemplate(pluralTemplates map[plural.Form]*internal.Template, pluralForm plural.Form, src, leftDelim, rightDelim string) {
-	if src != "" {
-		pluralTemplates[pluralForm] = &internal.Template{
-			Src:        src,
-			LeftDelim:  leftDelim,
-			RightDelim: rightDelim,
-		}
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 type pluralFormNotFoundError struct {
@@ -48,35 +27,18 @@ type pluralFormNotFoundError struct {
 	messageID  string
 }
 
-func (e pluralFormNotFoundError) Error() string {
-	return fmt.Sprintf("message %q has no plural form %q", e.messageID, e.pluralForm)
-}
+func (e pluralFormNotFoundError) Error() string { _ = "STUB: not implemented"; return "" }
 
 // Execute executes the template for the plural form and template data.
 // Deprecated: This method is no longer used internally by go-i18n and it probably should not have been exported to
 // begin with. Its replacement is not exported. If you depend on this method for some reason and/or have
 // a use case for exporting execute, please file an issue.
 func (mt *MessageTemplate) Execute(pluralForm plural.Form, data interface{}, funcs texttemplate.FuncMap) (string, error) {
-	t := mt.PluralTemplates[pluralForm]
-	if t == nil {
-		return "", pluralFormNotFoundError{
-			pluralForm: pluralForm,
-			messageID:  mt.ID,
-		}
-	}
-	parser := &template.TextParser{
-		Funcs: funcs,
-	}
-	return t.Execute(parser, data)
+	_ = "STUB: not implemented"
+	return "", nil
 }
 
 func (mt *MessageTemplate) execute(pluralForm plural.Form, data interface{}, parser template.Parser) (string, error) {
-	t := mt.PluralTemplates[pluralForm]
-	if t == nil {
-		return "", pluralFormNotFoundError{
-			pluralForm: pluralForm,
-			messageID:  mt.ID,
-		}
-	}
-	return t.Execute(parser, data)
+	_ = "STUB: not implemented"
+	return "", nil
 }

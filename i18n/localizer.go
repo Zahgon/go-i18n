@@ -1,7 +1,6 @@
 package i18n
 
 import (
-	"fmt"
 	texttemplate "text/template"
 
 	"github.com/nicksnyder/go-i18n/v2/i18n/template"
@@ -32,23 +31,11 @@ type Localizer struct {
 // in the bundle according to the language preferences in langs.
 // It can parse Accept-Language headers as defined in http://www.ietf.org/rfc/rfc2616.txt.
 func NewLocalizer(bundle *Bundle, langs ...string) *Localizer {
-	return &Localizer{
-		bundle: bundle,
-		tags:   parseTags(langs),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func parseTags(langs []string) []language.Tag {
-	tags := []language.Tag{}
-	for _, lang := range langs {
-		t, _, err := language.ParseAcceptLanguage(lang)
-		if err != nil {
-			continue
-		}
-		tags = append(tags, t...)
-	}
-	return tags
-}
+func parseTags(langs []string) []language.Tag { _ = "STUB: not implemented"; return nil }
 
 // LocalizeConfig configures a call to the Localize method on Localizer.
 type LocalizeConfig struct {
@@ -78,15 +65,8 @@ type LocalizeConfig struct {
 var defaultTextParser = &template.TextParser{}
 
 func (lc *LocalizeConfig) getTemplateParser() template.Parser {
-	if lc.TemplateParser != nil {
-		return lc.TemplateParser
-	}
-	if lc.Funcs != nil {
-		return &template.TextParser{
-			Funcs: lc.Funcs,
-		}
-	}
-	return defaultTextParser
+	_ = "STUB: not implemented"
+	return *new(template.Parser)
 }
 
 type invalidPluralCountErr struct {
@@ -95,9 +75,7 @@ type invalidPluralCountErr struct {
 	err         error
 }
 
-func (e *invalidPluralCountErr) Error() string {
-	return fmt.Sprintf("invalid plural count %#v for message id %q: %s", e.pluralCount, e.messageID, e.err)
-}
+func (e *invalidPluralCountErr) Error() string { _ = "STUB: not implemented"; return "" }
 
 // MessageNotFoundErr is returned from Localize when a message could not be found.
 type MessageNotFoundErr struct {
@@ -105,30 +83,25 @@ type MessageNotFoundErr struct {
 	MessageID string
 }
 
-func (e *MessageNotFoundErr) Error() string {
-	return fmt.Sprintf("message %q not found in language %q", e.MessageID, e.Tag)
-}
+func (e *MessageNotFoundErr) Error() string { _ = "STUB: not implemented"; return "" }
 
 type messageIDMismatchErr struct {
 	messageID        string
 	defaultMessageID string
 }
 
-func (e *messageIDMismatchErr) Error() string {
-	return fmt.Sprintf("message id %q does not match default message id %q", e.messageID, e.defaultMessageID)
-}
+func (e *messageIDMismatchErr) Error() string { _ = "STUB: not implemented"; return "" }
 
 // Localize returns a localized message.
 func (l *Localizer) Localize(lc *LocalizeConfig) (string, error) {
-	msg, _, err := l.LocalizeWithTag(lc)
-	return msg, err
+	_ = "STUB: not implemented"
+	return "", nil
 }
 
 // LocalizeMessage returns a localized message.
 func (l *Localizer) LocalizeMessage(msg *Message) (string, error) {
-	return l.Localize(&LocalizeConfig{
-		DefaultMessage: msg,
-	})
+	_ = "STUB: not implemented"
+	return "", nil
 }
 
 // TODO: uncomment this (and the test) when extract has been updated to extract these call sites too.
@@ -142,106 +115,28 @@ func (l *Localizer) LocalizeMessage(msg *Message) (string, error) {
 // LocalizeWithTag returns a localized message and the language tag.
 // It may return a best effort localized message even if an error happens.
 func (l *Localizer) LocalizeWithTag(lc *LocalizeConfig) (string, language.Tag, error) {
-	messageID := lc.MessageID
-	if lc.DefaultMessage != nil {
-		if messageID != "" && messageID != lc.DefaultMessage.ID {
-			return "", language.Und, &messageIDMismatchErr{messageID: messageID, defaultMessageID: lc.DefaultMessage.ID}
-		}
-		messageID = lc.DefaultMessage.ID
-	}
-
-	var operands *plural.Operands
-	templateData := lc.TemplateData
-	if lc.PluralCount != nil {
-		var err error
-		operands, err = plural.NewOperands(lc.PluralCount)
-		if err != nil {
-			return "", language.Und, &invalidPluralCountErr{messageID: messageID, pluralCount: lc.PluralCount, err: err}
-		}
-		if templateData == nil {
-			templateData = map[string]interface{}{
-				"PluralCount": lc.PluralCount,
-			}
-		}
-	}
-
-	tag, template, err := l.getMessageTemplate(messageID, lc.DefaultMessage)
-	if template == nil {
-		return "", language.Und, err
-	}
-
-	pluralForm := l.pluralForm(tag, operands)
-	templateParser := lc.getTemplateParser()
-	msg, err2 := template.execute(pluralForm, templateData, templateParser)
-	if err2 != nil {
-		if err == nil {
-			err = err2
-		}
-
-		// Attempt to fallback to "Other" pluralization in case translations are incomplete.
-		if pluralForm != plural.Other {
-			msg2, err3 := template.execute(plural.Other, templateData, templateParser)
-			if err3 == nil {
-				msg = msg2
-			}
-		}
-	}
-	return msg, tag, err
+	_ = "STUB: not implemented"
+	return "", *new(language.Tag), nil
 }
+
+// Attempt to fallback to "Other" pluralization in case translations are incomplete.
 
 func (l *Localizer) getMessageTemplate(id string, defaultMessage *Message) (language.Tag, *MessageTemplate, error) {
-	_, i, _ := l.bundle.matcher.Match(l.tags...)
-	tag := l.bundle.tags[i]
-	mt := l.bundle.getMessageTemplate(tag, id)
-	if mt != nil {
-		return tag, mt, nil
-	}
-
-	if tag == l.bundle.defaultLanguage {
-		if defaultMessage == nil {
-			return language.Und, nil, &MessageNotFoundErr{Tag: tag, MessageID: id}
-		}
-		mt := NewMessageTemplate(defaultMessage)
-		if mt == nil {
-			return language.Und, nil, &MessageNotFoundErr{Tag: tag, MessageID: id}
-		}
-		return tag, mt, nil
-	}
-
-	// Fallback to default language in bundle.
-	mt = l.bundle.getMessageTemplate(l.bundle.defaultLanguage, id)
-	if mt != nil {
-		return l.bundle.defaultLanguage, mt, &MessageNotFoundErr{Tag: tag, MessageID: id}
-	}
-
-	// Fallback to default message.
-	if defaultMessage == nil {
-		return language.Und, nil, &MessageNotFoundErr{Tag: tag, MessageID: id}
-	}
-	return l.bundle.defaultLanguage, NewMessageTemplate(defaultMessage), &MessageNotFoundErr{Tag: tag, MessageID: id}
+	_ = "STUB: not implemented"
+	return *new(language.Tag), nil, nil
 }
 
+// Fallback to default language in bundle.
+
+// Fallback to default message.
+
 func (l *Localizer) pluralForm(tag language.Tag, operands *plural.Operands) plural.Form {
-	if operands == nil {
-		return plural.Other
-	}
-	return l.bundle.pluralRules.Rule(tag).PluralFormFunc(operands)
+	_ = "STUB: not implemented"
+	return *new(plural.Form)
 }
 
 // MustLocalize is similar to Localize, except it panics if an error happens.
-func (l *Localizer) MustLocalize(lc *LocalizeConfig) string {
-	localized, err := l.Localize(lc)
-	if err != nil {
-		panic(err)
-	}
-	return localized
-}
+func (l *Localizer) MustLocalize(lc *LocalizeConfig) string { _ = "STUB: not implemented"; return "" }
 
 // MustLocalizeMessage is similar to LocalizeMessage, except it panics if an error happens.
-func (l *Localizer) MustLocalizeMessage(msg *Message) string {
-	localized, err := l.LocalizeMessage(msg)
-	if err != nil {
-		panic(err)
-	}
-	return localized
-}
+func (l *Localizer) MustLocalizeMessage(msg *Message) string { _ = "STUB: not implemented"; return "" }
